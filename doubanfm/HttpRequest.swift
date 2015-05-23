@@ -27,10 +27,27 @@ class HttpRequest {
         req.HTTPMethod = "POST";
         req.HTTPBody = httpbody;
         
+        println(req)
+        println(req.HTTPBody)
+        println(req.allHTTPHeaderFields);
+        
         var defaultData:NSData = NSData();
         let urlData = NSURLConnection.sendSynchronousRequest(req, returningResponse: &response, error: &error)
         if let httpResponse = response as? NSHTTPURLResponse {
+            //获取cookie方法3
+            var cookieJar = NSHTTPCookieStorage.sharedHTTPCookieStorage();
+            for cookie in cookieJar.cookies! {
+                println(cookie.name)
+                println(cookie.version);
+                var value: AnyObject = cookie.valueForKey("value")!;
+                println(value);
+                
+                //设置存储信息
+                NSUserDefaults.standardUserDefaults().setObject(value, forKey: cookie.name)
+                NSUserDefaults.standardUserDefaults().synchronize();
+            }
             return urlData!;
+            
         }
         return defaultData;
     }
@@ -42,11 +59,22 @@ class HttpRequest {
         var response: NSURLResponse?
         var error: NSError?
         
-        let urlData = NSURLConnection.sendSynchronousRequest(NSURLRequest(URL: NSURL(string: url)!), returningResponse: &response, error: &error)
+        
+        var req = NSMutableURLRequest(URL: NSURL(string: url)!);
+        
+        var dbcl2 = NSUserDefaults.standardUserDefaults().valueForKey("dbcl2") as! String!;
+        var bid = NSUserDefaults.standardUserDefaults().valueForKey("bid") as! String!;
+        var fmNlogin = NSUserDefaults.standardUserDefaults().valueForKey("fmNlogin") as! String!;
+        
+        if fmNlogin == "y" {
+            req.addValue("bid=\(bid);dbcl2=\(dbcl2);fmNlogin=\(fmNlogin)",forHTTPHeaderField: "Cookie");
+        }
+        
+        let urlData = NSURLConnection.sendSynchronousRequest(req, returningResponse: &response, error: &error)
         if let httpResponse = response as? NSHTTPURLResponse {
             return urlData!;
         }
-                return defaultData;
+        return defaultData;
     }
     
     func asyncGet(url:String)->NSData{

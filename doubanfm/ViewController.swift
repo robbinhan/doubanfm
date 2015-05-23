@@ -6,7 +6,8 @@
 //  Copyright (c) 2015年 robbin. All rights reserved.
 //
 
-import UIKit
+import UIKit;
+
 
 class ViewController: UIViewController {
     
@@ -34,8 +35,27 @@ class ViewController: UIViewController {
     
     
     @IBAction func login(sender:UIButton){
-        var ret:Bool = api.login(email.text!, password: password.text!,captcha_solution:captchaText.text!);
+        var user_id = NSUserDefaults.standardUserDefaults().valueForKey("user_id") as! String!
         
+        if let id = user_id {
+            println("logined")
+            var dbcl2 = NSUserDefaults.standardUserDefaults().valueForKey("dbcl2") as! String!;
+            println(dbcl2);
+        } else {
+            var ret:Bool = api.login(email.text!, password: password.text!,captcha_solution:captchaText.text!);
+            println("else logined")
+            var dbcl2 = NSUserDefaults.standardUserDefaults().valueForKey("dbcl2") as! String!;
+            println(dbcl2);
+            
+            var data:NSArray = api.favoriteList();
+            
+            var playerViewController = PlayerViewController();
+            playerViewController.title = "Remote Music ♫";
+            playerViewController.tracks = Track.remoteTracks()
+            
+            [[self navigationController] pushViewController:playerViewController
+                animated:YES];
+        }
     }
 
 
