@@ -17,22 +17,6 @@ class Api{
     }
     
     func login(email:String,password:String,captcha_solution:String)->Bool{
-        
-        
-        //获取cookie方法3
-        var cookieJar = NSHTTPCookieStorage.sharedHTTPCookieStorage();
-        if let cookies = cookieJar.cookies {
-            println("before login cookies");
-            for cookie in cookies {
-                //设置存储信息
-                NSUserDefaults.standardUserDefaults().setObject(cookie.valueForKey("value")!, forKey: cookie.name)
-                NSUserDefaults.standardUserDefaults().synchronize();
-            }
-            return true;
-        }
-
-        
-        
             var url = "http://douban.fm/j/login";
             var params = ["remember":"off","source":"radio","captcha_solution":captcha_solution,"alias":email,"form_password":password,"captcha_id":self.captcha_id];
             var http = HttpRequest();
@@ -49,7 +33,7 @@ class Api{
         
         //2
         if let body_dic = parsedObject as? NSDictionary {
-             if let r = body_dic["r"] as? NSDictionary {
+             if let r = body_dic["r"] as? Int {
                 if r == 0 {
                     if let user_info = body_dic["user_info"] as? NSDictionary {
                         if let id:AnyObject = user_info["id"] {
@@ -88,20 +72,20 @@ class Api{
         var http = HttpRequest();
         var url = "http://douban.fm/j/mine/playlist?from=mainsite&channel=-3&kbps=64&h=&sid=&type=n&r=927c04500d89d"
         var data = http.get(url);
-            var parseError: NSError?
-            let parsedObject: AnyObject? = NSJSONSerialization.JSONObjectWithData(data,
+        var parseError: NSError?
+        let parsedObject: AnyObject? = NSJSONSerialization.JSONObjectWithData(data,
                 options: NSJSONReadingOptions.AllowFragments,
                 error:&parseError)
-            
-            if let body_dic = parsedObject as? NSDictionary {
-                if let r = body_dic["r"] as? NSDictionary {
+        
+        if let body_dic = parsedObject as? NSDictionary {
+                if let r = body_dic["r"] as? Int {
                     if r == 0 {
                         if let songs = body_dic["song"] as? NSArray {
                             return songs;
                         }
                     }
                 }
-            }
+        }
         return result;
     }
 }

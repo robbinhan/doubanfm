@@ -27,10 +27,6 @@ class HttpRequest {
         req.HTTPMethod = "POST";
         req.HTTPBody = httpbody;
         
-        println(req)
-        println(req.HTTPBody)
-        println(req.allHTTPHeaderFields);
-        
         var defaultData:NSData = NSData();
         let urlData = NSURLConnection.sendSynchronousRequest(req, returningResponse: &response, error: &error)
         if let httpResponse = response as? NSHTTPURLResponse {
@@ -38,8 +34,8 @@ class HttpRequest {
             var cookieJar = NSHTTPCookieStorage.sharedHTTPCookieStorage();
             for cookie in cookieJar.cookies! {
                 println(cookie.name)
-                println(cookie.version);
                 var value: AnyObject = cookie.valueForKey("value")!;
+                value = value.stringByReplacingOccurrencesOfString("\"", withString: "");
                 println(value);
                 
                 //设置存储信息
@@ -66,14 +62,17 @@ class HttpRequest {
         var bid = NSUserDefaults.standardUserDefaults().valueForKey("bid") as! String!;
         var fmNlogin = NSUserDefaults.standardUserDefaults().valueForKey("fmNlogin") as! String!;
         
-        if fmNlogin == "y" {
-            req.addValue("bid=\(bid);dbcl2=\(dbcl2);fmNlogin=\(fmNlogin)",forHTTPHeaderField: "Cookie");
+        if let login = fmNlogin {
+            if login == "y" {
+                req.addValue("bid=\(bid);dbcl2=\(dbcl2);fmNlogin=\(fmNlogin)",forHTTPHeaderField: "Cookie");
+            }
         }
         
         let urlData = NSURLConnection.sendSynchronousRequest(req, returningResponse: &response, error: &error)
         if let httpResponse = response as? NSHTTPURLResponse {
             return urlData!;
         }
+
         return defaultData;
     }
     

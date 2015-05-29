@@ -7,6 +7,7 @@
 //
 
 import UIKit;
+import AVFoundation;
 
 
 class ViewController: UIViewController {
@@ -49,12 +50,19 @@ class ViewController: UIViewController {
             
             var data:NSArray = api.favoriteList();
             
-            var playerViewController = PlayerViewController();
-            playerViewController.title = "Remote Music ♫";
-            playerViewController.tracks = Track.remoteTracks()
+            var song_info = data.firstObject as? NSDictionary;
             
-            [[self navigationController] pushViewController:playerViewController
-                animated:YES];
+            println(song_info)
+            var url = song_info?.valueForKey("url") as! String!;
+            println(url)
+            var steamingURL:NSURL = NSURL(string:url)!
+            var player = AVPlayer(URL: steamingURL)
+            println(player.volume)
+                        println(player.status)
+                                    println(player.error)
+            player.play()
+                                                println(player.status)
+                                                println(player.error)
         }
     }
 
